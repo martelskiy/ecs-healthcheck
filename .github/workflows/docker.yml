@@ -2,10 +2,10 @@ name: "Workflow for Docker"
 
 on:
   workflow_run:
-    workflows: ["Workflow for Go applications", "Workflow for Terraform configuration"]
+    workflows: ["Workflow for Terraform configuration"]
     types: 
       - completed
-      
+
 env:
   AWS_REGION: "eu-north-1"
   IMAGE_TAG: 1.0.0
@@ -13,6 +13,7 @@ env:
 jobs:
   build-push:
     name: Build Push Docker Image
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
         id-token: write

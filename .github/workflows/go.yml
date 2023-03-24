@@ -1,9 +1,6 @@
 name: "Workflow for Go applications"
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
