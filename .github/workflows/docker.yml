@@ -1,18 +1,42 @@
-name: "Workflow for Docker"
+name: "Workflow Go and Docker"
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["Workflow for Terraform configuration"]
+    types: 
+      - completed
+
 env:
   AWS_REGION: "eu-north-1"
+  IMAGE_TAG: 1.0.0
 
 jobs:
-  build-push:
+  go-build-test-lint:
+    name: "Runs Go related CI steps"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '1.20.x'
+          cache: true
+
+      - name: Build
+        run: make build
+
+      - name: Test
+        run: make test
+      
+      - name: Lint
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: latest
+
+  docker-build-push:
     name: Build Push Docker Image
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     permissions:
         id-token: write
@@ -46,7 +70,7 @@ jobs:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         ECR_REPOSITORY: ecs-healthcheck
         DOCKERFILE_DIR: build
-        IMAGE_TAG: ${{ github.sha }} #GITHUB_RUN_ID
+        IMAGE_TAG: ${{ env.IMAGE_TAG }} #GITHUB_RUN_ID #GITHUB_SHA
       run: |
         docker buildx create --use
         docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 --push -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f $DOCKERFILE_DIR/Dockerfile .
