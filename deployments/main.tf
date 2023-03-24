@@ -7,7 +7,7 @@ locals {
 ################################################################################
 resource "aws_ecr_repository" "this" {
   name                 = local.repository_name
-  image_tag_mutability = "IMMUTABLE"
+  image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
@@ -42,23 +42,26 @@ data "aws_iam_policy_document" "ecr" {
 resource "aws_ecr_lifecycle_policy" "this" {
   repository = aws_ecr_repository.this.name
 
-  policy = <<EOF
-{
-    "rules": [
+  policy = jsonencode(
+    {
+      rules = [
         {
-            "rulePriority": 1,
-            "description": "Expire images older than 30 days",
-            "selection": {
-                "tagStatus": "any",
-                "countType": "sinceImagePushed",
-                "countUnit": "days",
-                "countNumber": 30
-            },
-            "action": {
-                "type": "expire"
-            }
+          rulePriority = 1
+          description  = "Expire untagged images older than 14 days"
+          selection = {
+            tagStatus   = "untagged"
+            countType   = "sinceImagePushed"
+            countUnit   = "days"
+            countNumber = 14
+          }
+          action = {
+            type = "expire"
+          }
         }
-    ]
-}
-EOF
+      ]
+    }
+  )
+  depends_on = [
+    aws_ecr_repository.this
+  ]
 }
