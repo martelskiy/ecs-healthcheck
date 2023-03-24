@@ -1,0 +1,20 @@
+linters:
+  enable:
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    - tagliatelle
+  fast: true
+
+linters-settings:
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: goCamel
+        yaml: goCamel
+        xml: goCamel
