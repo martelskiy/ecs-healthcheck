@@ -37,6 +37,7 @@ jobs:
   docker-build-push:
     name: Build Push Docker Image
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: go-build-test-lint
     runs-on: ubuntu-latest
     permissions:
         id-token: write
@@ -54,7 +55,7 @@ jobs:
           role-session-name: GithubActionsSession
 
     - name: Configure AWS Credentials Production
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/main'
       uses: aws-actions/configure-aws-credentials@v2
       with:
           aws-region: ${{ env.AWS_REGION }}
