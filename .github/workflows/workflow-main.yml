@@ -22,4 +22,5 @@ jobs:
       contents: read
     with:
       ecr-repository: ecs-healthcheck
+      image-tag: 1.0.0
   
