@@ -33,4 +33,5 @@ jobs:
     with:
       ecr-repository: ecs-healthcheck
       image-tag: 1.0.0
+      cross-platform: true
   
