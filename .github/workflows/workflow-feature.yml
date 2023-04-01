@@ -8,25 +8,9 @@ on:
 jobs:
   go-build-test-lint:
     uses: martelskiy/workflows/.github/workflows/go.yml@main
-  terraform-validate:
-    uses: martelskiy/workflows/.github/workflows/terraform-validate.yml@main
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      working-directory: ./deployments
-  terraform-deploy:
-    uses: martelskiy/workflows/.github/workflows/terraform-deploy.yml@main
-    needs: terraform-validate
-    permissions:
-      id-token: write
-      contents: read
-    with:
-      working-directory: ./deployments
-      environment: 'development'
   docker-build-push:
     uses: martelskiy/workflows/.github/workflows/docker.yml@main
-    needs: [go-build-test-lint, terraform-deploy]
+    needs: [go-build-test-lint]
     permissions:
       id-token: write
       contents: read
