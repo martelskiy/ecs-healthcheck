@@ -8,6 +8,8 @@ on:
 jobs:
   go-build-test-lint:
     uses: martelskiy/workflows/.github/workflows/go.yml@main
+    secrets:
+      PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
   docker-build-push:
     uses: martelskiy/workflows/.github/workflows/docker.yml@main
     needs: [go-build-test-lint]
